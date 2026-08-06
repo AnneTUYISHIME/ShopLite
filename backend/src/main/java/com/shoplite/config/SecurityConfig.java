@@ -1,7 +1,6 @@
 package com.shoplite.config;
 
-import java.util.List;
-
+import com.shoplite.security.JwtAuthFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.shoplite.security.JwtAuthFilter;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -68,6 +67,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/v3/api-docs").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/webhooks/**").permitAll()
+                .requestMatchers("/api/seller/**").hasRole("SELLER")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
