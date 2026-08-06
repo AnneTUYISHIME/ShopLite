@@ -9,11 +9,14 @@ public class ProductResponse {
     private String imageUrl;
     private String category;
     private Integer stock;
+    private Long sellerId;
+    private String sellerName;
 
     public ProductResponse() {
     }
 
-    public ProductResponse(Long id, String name, String description, Double price, String imageUrl, String category, Integer stock) {
+    public ProductResponse(Long id, String name, String description, Double price, String imageUrl,
+                            String category, Integer stock, Long sellerId, String sellerName) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -21,6 +24,8 @@ public class ProductResponse {
         this.imageUrl = imageUrl;
         this.category = category;
         this.stock = stock;
+        this.sellerId = sellerId;
+        this.sellerName = sellerName;
     }
 
     public Long getId() {
@@ -77,5 +82,21 @@ public class ProductResponse {
 
     public void setStock(Integer stock) {
         this.stock = stock;
+    }
+
+    public Long getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(Long sellerId) {
+        this.sellerId = sellerId;
+    }
+
+    public String getSellerName() {
+        return sellerName;
+    }
+
+    public void setSellerName(String sellerName) {
+        this.sellerName = sellerName;
     }
 }

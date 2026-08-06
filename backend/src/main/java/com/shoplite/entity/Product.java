@@ -1,11 +1,6 @@
 package com.shoplite.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "products")
@@ -31,16 +26,21 @@ public class Product {
     @Column(nullable = false)
     private Integer stock;
 
+    @ManyToOne
+    @JoinColumn(name = "seller_id", nullable = false)
+    private User seller;
+
     public Product() {
     }
 
-    public Product(String name, String description, Double price, String imageUrl, String category, Integer stock) {
+    public Product(String name, String description, Double price, String imageUrl, String category, Integer stock, User seller) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.imageUrl = imageUrl;
         this.category = category;
         this.stock = stock;
+        this.seller = seller;
     }
 
     public Long getId() {
@@ -97,5 +97,13 @@ public class Product {
 
     public void setStock(Integer stock) {
         this.stock = stock;
+    }
+
+    public User getSeller() {
+        return seller;
+    }
+
+    public void setSeller(User seller) {
+        this.seller = seller;
     }
 }
