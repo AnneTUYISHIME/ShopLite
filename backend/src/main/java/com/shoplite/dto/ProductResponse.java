@@ -11,12 +11,15 @@ public class ProductResponse {
     private Integer stock;
     private Long sellerId;
     private String sellerName;
+    private Double averageRating;
+    private Integer reviewCount;
 
     public ProductResponse() {
     }
 
     public ProductResponse(Long id, String name, String description, Double price, String imageUrl,
-                            String category, Integer stock, Long sellerId, String sellerName) {
+                            String category, Integer stock, Long sellerId, String sellerName,
+                            Double averageRating, Integer reviewCount) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -26,6 +29,8 @@ public class ProductResponse {
         this.stock = stock;
         this.sellerId = sellerId;
         this.sellerName = sellerName;
+        this.averageRating = averageRating;
+        this.reviewCount = reviewCount;
     }
 
     public Long getId() {
@@ -98,5 +103,21 @@ public class ProductResponse {
 
     public void setSellerName(String sellerName) {
         this.sellerName = sellerName;
+    }
+
+    public Double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public Integer getReviewCount() {
+        return reviewCount;
+    }
+
+    public void setReviewCount(Integer reviewCount) {
+        this.reviewCount = reviewCount;
     }
 }

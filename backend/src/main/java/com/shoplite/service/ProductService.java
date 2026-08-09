@@ -5,6 +5,7 @@ import com.shoplite.dto.ProductResponse;
 import com.shoplite.entity.Product;
 import com.shoplite.entity.User;
 import com.shoplite.repository.ProductRepository;
+import com.shoplite.repository.ReviewRepository;
 import com.shoplite.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +16,13 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
 
-    public ProductService(ProductRepository productRepository, UserRepository userRepository) {
+    public ProductService(ProductRepository productRepository, UserRepository userRepository,
+                           ReviewRepository reviewRepository) {
         this.productRepository = productRepository;
         this.userRepository = userRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     public List<ProductResponse> getAllProducts() {
@@ -93,7 +97,12 @@ public class ProductService {
         productRepository.delete(product);
     }
 
-    private ProductResponse toResponse(Product product) {
+    // Package-private (not private) so WishlistService/ReviewService can reuse
+    // this mapping instead of duplicating it.
+    ProductResponse toResponse(Product product) {
+        Double averageRating = reviewRepository.findAverageRatingForProduct(product);
+        long reviewCount = reviewRepository.countByProduct(product);
+
         return new ProductResponse(
                 product.getId(),
                 product.getName(),
@@ -103,7 +112,9 @@ public class ProductService {
                 product.getCategory(),
                 product.getStock(),
                 product.getSeller().getId(),
-                product.getSeller().getName()
+                product.getSeller().getName(),
+                averageRating,
+                (int) reviewCount
         );
     }
 }
