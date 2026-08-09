@@ -57,6 +57,7 @@ public class AdminService {
         List<OrderItemResponse> items = order.getItems().stream()
                 .map(item -> new OrderItemResponse(
                         item.getProduct().getName(),
+                        item.getProduct().getImageUrl(),
                         item.getQuantity(),
                         item.getPriceAtPurchase()
                 ))

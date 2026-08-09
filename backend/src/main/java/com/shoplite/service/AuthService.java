@@ -1,12 +1,18 @@
 package com.shoplite.service;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import com.shoplite.dto.AuthResponse;
 import com.shoplite.dto.LoginRequest;
 import com.shoplite.dto.RegisterRequest;
+import com.shoplite.entity.PasswordResetToken;
 import com.shoplite.entity.Role;
 import com.shoplite.entity.User;
+import com.shoplite.repository.PasswordResetTokenRepository;
 import com.shoplite.repository.UserRepository;
 import com.shoplite.security.JwtService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,15 +26,27 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final EmailService emailService;
+
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
+
+    @Value("${app.password-reset.token-expiration-minutes}")
+    private long tokenExpirationMinutes;
 
     public AuthService(UserRepository userRepository,
                         PasswordEncoder passwordEncoder,
                         AuthenticationManager authenticationManager,
-                        JwtService jwtService) {
+                        JwtService jwtService,
+                        PasswordResetTokenRepository passwordResetTokenRepository,
+                        EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.emailService = emailService;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -95,5 +113,37 @@ public class AuthService {
                 "Login successful",
                 token
         );
+    }
+
+    // Always returns the same generic outcome regardless of whether the email
+    // exists, so this endpoint can't be used to check which emails are registered.
+    public void requestPasswordReset(String email) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+            PasswordResetToken resetToken = new PasswordResetToken(
+                    UUID.randomUUID().toString(),
+                    user,
+                    LocalDateTime.now().plusMinutes(tokenExpirationMinutes)
+            );
+            passwordResetTokenRepository.save(resetToken);
+
+            String resetLink = frontendUrl + "/reset-password?token=" + resetToken.getToken();
+            emailService.sendPasswordResetEmail(user.getEmail(), resetLink);
+        });
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid or expired reset link"));
+
+        if (resetToken.isUsed() || resetToken.isExpired()) {
+            throw new IllegalArgumentException("Invalid or expired reset link");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        resetToken.setUsed(true);
+        passwordResetTokenRepository.save(resetToken);
     }
 }
