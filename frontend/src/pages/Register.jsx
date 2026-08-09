@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../api/axios';
 
 function Register() {
+  const [searchParams] = useSearchParams();
+  const role = searchParams.get('role') === 'SELLER' ? 'SELLER' : 'CUSTOMER';
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,7 +19,7 @@ function Register() {
     setError('');
     setLoading(true);
     try {
-      await api.post('/auth/register', { name, email, password });
+      await api.post('/auth/register', { name, email, password, role });
       navigate('/login');
     } catch (err) {
       setError(err.response?.data?.error || 'Registration failed');
@@ -29,7 +32,14 @@ function Register() {
     <div className="min-h-screen bg-[var(--bg)]">
       <Navbar />
       <div className="max-w-sm mx-auto px-6 py-16">
-        <h1 className="text-2xl font-bold mb-6">Create Account</h1>
+        <h1 className="text-2xl font-bold mb-2">
+          {role === 'SELLER' ? 'Become a Seller' : 'Create Account'}
+        </h1>
+        <p className="text-sm text-[var(--muted)] mb-6">
+          {role === 'SELLER'
+            ? "You're signing up to sell products on ShopLite."
+            : "You're signing up to shop on ShopLite."}
+        </p>
 
         {error && (
           <div className="bg-red-50 text-red-700 border border-red-200 p-3 rounded-lg mb-4 text-sm">

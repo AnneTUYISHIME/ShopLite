@@ -46,11 +46,18 @@ function Orders() {
                 </span>
               </div>
 
-              <div className="text-sm text-[var(--muted)] space-y-1 pt-3 border-t border-[var(--border)]">
+              <div className="space-y-2 pt-3 border-t border-[var(--border)]">
                 {order.items.map((item, idx) => (
-                  <p key={idx}>
-                    {item.productName} × {item.quantity} — RWF {(item.priceAtPurchase * item.quantity).toLocaleString()}
-                  </p>
+                  <div key={idx} className="flex items-center gap-3 text-sm text-[var(--muted)]">
+                    <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                      {item.productImageUrl && (
+                        <img src={item.productImageUrl} alt={item.productName} className="w-full h-full object-cover" />
+                      )}
+                    </div>
+                    <p>
+                      {item.productName} × {item.quantity} — RWF {(item.priceAtPurchase * item.quantity).toLocaleString()}
+                    </p>
+                  </div>
                 ))}
               </div>
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../api/axios';
+import { useCart } from '../context/CartContext';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -9,6 +10,7 @@ function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { clearCart } = useCart();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,6 +21,7 @@ function Login() {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('name', response.data.name);
       localStorage.setItem('role', response.data.role);
+      clearCart();
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.error || 'Invalid email or password');
@@ -49,7 +52,12 @@ function Login() {
             className="w-full border border-[var(--border)] rounded-lg px-3 py-2.5 mb-4"
           />
 
-          <label className="block text-sm font-medium mb-1.5">Password</label>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="block text-sm font-medium">Password</label>
+            <Link to="/forgot-password" className="text-sm font-medium" style={{ color: 'var(--accent)' }}>
+              Forgot password?
+            </Link>
+          </div>
           <input
             type="password"
             required

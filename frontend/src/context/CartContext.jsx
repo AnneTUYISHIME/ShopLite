@@ -1,9 +1,17 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
+
+  // Clear the cart whenever the logged-in user changes (login, logout, or
+  // switching accounts) - this is what fixes "seeing someone else's cart."
+  useEffect(() => {
+    const handleStorageChange = () => setItems([]);
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const addToCart = (product, quantity) => {
     setItems((prev) => {

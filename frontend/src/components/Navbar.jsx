@@ -1,9 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, LogOut } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Home } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 function Navbar() {
-  const { items } = useCart();
+  const { items, clearCart } = useCart();
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const name = localStorage.getItem('name');
@@ -15,6 +15,7 @@ function Navbar() {
     localStorage.removeItem('token');
     localStorage.removeItem('name');
     localStorage.removeItem('role');
+    clearCart();
     navigate('/');
   };
 
@@ -26,28 +27,42 @@ function Navbar() {
         </Link>
 
         <div className="flex items-center gap-5">
+          <Link to="/" className="hidden sm:flex items-center gap-1 text-sm text-[var(--muted)] hover:text-[var(--text)]">
+            <Home size={15} /> Home
+          </Link>
+          <Link to="/shop" className="text-sm text-[var(--muted)] hover:text-[var(--text)]">
+            Shop
+          </Link>
+
+          {role === 'SELLER' && (
+            <Link to="/seller" className="text-sm text-[var(--muted)] hover:text-[var(--text)]">
+              My Store
+            </Link>
+          )}
           {role === 'ADMIN' && (
             <Link to="/admin" className="text-sm text-[var(--muted)] hover:text-[var(--text)]">
               Admin
             </Link>
           )}
-          {token && (
+          {token && role === 'CUSTOMER' && (
             <Link to="/orders" className="text-sm text-[var(--muted)] hover:text-[var(--text)]">
               My Orders
             </Link>
           )}
 
-          <Link to="/cart" className="relative">
-            <ShoppingCart size={20} />
-            {itemCount > 0 && (
-              <span
-                className="absolute -top-2 -right-2 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center"
-                style={{ background: 'var(--accent)' }}
-              >
-                {itemCount}
-              </span>
-            )}
-          </Link>
+          {role !== 'SELLER' && role !== 'ADMIN' && (
+            <Link to="/cart" className="relative">
+              <ShoppingCart size={20} />
+              {itemCount > 0 && (
+                <span
+                  className="absolute -top-2 -right-2 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center"
+                  style={{ background: 'var(--accent)' }}
+                >
+                  {itemCount}
+                </span>
+              )}
+            </Link>
+          )}
 
           {token ? (
             <div className="flex items-center gap-3">

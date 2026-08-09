@@ -7,7 +7,7 @@ import api from '../api/axios';
 const CLOUDINARY_CLOUD_NAME = 'di2jkpsdb';
 const CLOUDINARY_UPLOAD_PRESET = 'hiresmart_cvs';
 
-function Admin() {
+function SellerDashboard() {
   const role = localStorage.getItem('role');
 
   const [products, setProducts] = useState([]);
@@ -24,18 +24,18 @@ function Admin() {
   const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
 
-  const fetchProducts = () => {
-    api.get('/products')
+  const fetchMyProducts = () => {
+    api.get('/seller/products/me')
       .then((res) => setProducts(res.data))
       .catch(() => {})
       .finally(() => setLoading(false));
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchMyProducts();
   }, []);
 
-  if (role !== 'ADMIN') {
+  if (role !== 'SELLER') {
     return <Navigate to="/" replace />;
   }
 
@@ -97,15 +97,15 @@ function Admin() {
       };
 
       if (editingId) {
-        await api.put(`/admin/products/${editingId}`, payload);
+        await api.put(`/seller/products/${editingId}`, payload);
         setMessage('Product updated successfully!');
       } else {
-        await api.post('/admin/products', payload);
+        await api.post('/seller/products', payload);
         setMessage('Product created successfully!');
       }
 
       resetForm();
-      fetchProducts();
+      fetchMyProducts();
     } catch (err) {
       setMessage(err.response?.data?.error || 'Something went wrong');
     } finally {
@@ -116,8 +116,8 @@ function Admin() {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this product?')) return;
     try {
-      await api.delete(`/admin/products/${id}`);
-      fetchProducts();
+      await api.delete(`/seller/products/${id}`);
+      fetchMyProducts();
     } catch (err) {
       setMessage('Failed to delete product');
     }
@@ -127,7 +127,7 @@ function Admin() {
     <div className="min-h-screen bg-[var(--bg)]">
       <Navbar />
       <div className="max-w-4xl mx-auto px-6 py-10">
-        <h1 className="text-2xl font-bold mb-6">Manage Products</h1>
+        <h1 className="text-2xl font-bold mb-6">My Store</h1>
 
         {message && (
           <div className="bg-blue-50 text-blue-700 border border-blue-200 p-3 rounded-lg mb-4 text-sm">
@@ -182,9 +182,11 @@ function Admin() {
           </div>
         </form>
 
-        <h2 className="font-semibold mb-4">All Products</h2>
+        <h2 className="font-semibold mb-4">My Products</h2>
         {loading ? (
           <p className="text-[var(--muted)]">Loading...</p>
+        ) : products.length === 0 ? (
+          <p className="text-[var(--muted)]">You haven't listed any products yet.</p>
         ) : (
           <div className="space-y-3">
             {products.map((product) => (
@@ -211,4 +213,4 @@ function Admin() {
   );
 }
 
-export default Admin;
+export default SellerDashboard;
