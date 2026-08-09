@@ -4,10 +4,12 @@ import { ShoppingBag, Smartphone, CreditCard, Store, ArrowRight } from 'lucide-r
 import Navbar from '../components/Navbar';
 import ProductCard from '../components/ProductCard';
 import api from '../api/axios';
+import { useWishlist } from '../hooks/useWishlist';
 
 function Landing() {
   const [products, setProducts] = useState([]);
   const token = localStorage.getItem('token');
+  const { wishlistIds, toggleWishlist } = useWishlist();
 
   useEffect(() => {
     api.get('/products')
@@ -53,7 +55,12 @@ function Landing() {
 
         <div className="grid grid-cols-2 gap-4">
           {products.slice(0, 4).map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <ProductCard
+              key={p.id}
+              product={p}
+              isWishlisted={wishlistIds.has(p.id)}
+              onToggleWishlist={toggleWishlist}
+            />
           ))}
         </div>
       </section>
@@ -133,7 +140,7 @@ function Landing() {
       </section>
 
       <footer className="border-t border-[var(--border)] py-8 text-center text-sm text-[var(--muted)]">
-        © 2026 ShopLite — a demo marketplace built with Java, React, and Flutterwave.
+        © 2026 ShopLite. All rights reserved.
       </footer>
     </div>
   );

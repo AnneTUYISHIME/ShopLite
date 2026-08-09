@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, PackageSearch, Loader2 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import ProductCard from '../components/ProductCard';
 import api from '../api/axios';
+import { useWishlist } from '../hooks/useWishlist';
 
 function Home() {
   const [products, setProducts] = useState([]);
@@ -11,6 +12,7 @@ function Home() {
   const [search, setSearch] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get('category') || '';
+  const { wishlistIds, toggleWishlist } = useWishlist();
 
   useEffect(() => {
     api.get('/products')
@@ -39,7 +41,10 @@ function Home() {
     <div className="min-h-screen bg-[var(--bg)]">
       <Navbar />
       <div className="max-w-6xl mx-auto px-6 py-10">
-        <h1 className="text-2xl font-bold mb-6">Shop</h1>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold tracking-tight">Shop</h1>
+          <p className="text-sm text-[var(--muted)] mt-1">Browse everything on ShopLite in one place.</p>
+        </div>
 
         <div className="relative mb-5">
           <Search className="absolute left-3.5 top-3 text-[var(--muted)]" size={16} />
@@ -48,16 +53,17 @@ function Home() {
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 border border-[var(--border)] rounded-lg bg-[var(--surface)]"
+            className="w-full pl-10 pr-4 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] shadow-sm focus:outline-none focus:ring-2 transition-shadow"
+            style={{ '--tw-ring-color': 'color-mix(in srgb, var(--accent) 35%, transparent)' }}
           />
         </div>
 
         {categories.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex flex-wrap gap-2 mb-7">
             <button
               onClick={() => setSearchParams({})}
-              className="px-4 py-1.5 rounded-full text-sm font-medium"
-              style={!activeCategory ? { background: 'var(--accent)', color: 'white' } : { border: '1px solid var(--border)' }}
+              className="px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
+              style={!activeCategory ? { background: 'var(--accent)', color: 'white' } : { border: '1px solid var(--border)', color: 'var(--muted)' }}
             >
               All
             </button>
@@ -65,8 +71,8 @@ function Home() {
               <button
                 key={cat}
                 onClick={() => selectCategory(cat)}
-                className="px-4 py-1.5 rounded-full text-sm font-medium"
-                style={activeCategory === cat ? { background: 'var(--accent)', color: 'white' } : { border: '1px solid var(--border)' }}
+                className="px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
+                style={activeCategory === cat ? { background: 'var(--accent)', color: 'white' } : { border: '1px solid var(--border)', color: 'var(--muted)' }}
               >
                 {cat}
               </button>
@@ -74,15 +80,28 @@ function Home() {
           </div>
         )}
 
-        {loading && <p className="text-[var(--muted)]">Loading products...</p>}
+        {loading && (
+          <div className="flex items-center gap-2 text-[var(--muted)] py-16 justify-center">
+            <Loader2 size={18} className="animate-spin" />
+            <span className="text-sm">Loading products...</span>
+          </div>
+        )}
 
         {!loading && filteredProducts.length === 0 && (
-          <p className="text-[var(--muted)]">No products match your search.</p>
+          <div className="flex flex-col items-center justify-center gap-2 py-20 text-[var(--muted)]">
+            <PackageSearch size={32} strokeWidth={1.5} />
+            <p className="text-sm">No products match your search.</p>
+          </div>
         )}
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
           {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              isWishlisted={wishlistIds.has(product.id)}
+              onToggleWishlist={toggleWishlist}
+            />
           ))}
         </div>
       </div>

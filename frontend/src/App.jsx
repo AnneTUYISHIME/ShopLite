@@ -11,6 +11,8 @@ import Orders from './pages/Orders';
 import SellerDashboard from './pages/SellerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import OrderConfirmation from './pages/OrderConfirmation';
+import Settings from './pages/Settings';
+import Wishlist from './pages/Wishlist';
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
       <Route path="/seller" element={<SellerDashboard />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/order-confirmation" element={<OrderConfirmation />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/wishlist" element={<Wishlist />} />
     </Routes>
   );
 }

@@ -10,12 +10,31 @@
   --accent-dark: #C2410C;
 }
 
+[data-theme='dark'] {
+  --bg: #16140F;
+  --surface: #211E17;
+  --border: #38342A;
+  --text: #F5F3EE;
+  --muted: #A39C8C;
+  --accent: #FB923C;
+  --accent-dark: #EA580C;
+}
+
 * {
   box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
 }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: 'Inter', sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }

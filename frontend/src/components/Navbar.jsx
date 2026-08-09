@@ -1,23 +1,14 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, LogOut, Home } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ShoppingCart, User, Home, Heart, Settings as SettingsIcon } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 function Navbar() {
-  const { items, clearCart } = useCart();
-  const navigate = useNavigate();
+  const { items } = useCart();
   const token = localStorage.getItem('token');
   const name = localStorage.getItem('name');
   const role = localStorage.getItem('role');
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('name');
-    localStorage.removeItem('role');
-    clearCart();
-    navigate('/');
-  };
 
   return (
     <nav className="bg-[var(--surface)] border-b border-[var(--border)] sticky top-0 z-50">
@@ -51,6 +42,12 @@ function Navbar() {
           )}
 
           {role !== 'SELLER' && role !== 'ADMIN' && (
+            <Link to="/wishlist" className="hidden sm:flex text-[var(--muted)] hover:text-red-500 transition-colors" title="Wishlist">
+              <Heart size={19} />
+            </Link>
+          )}
+
+          {role !== 'SELLER' && role !== 'ADMIN' && (
             <Link to="/cart" className="relative">
               <ShoppingCart size={20} />
               {itemCount > 0 && (
@@ -65,14 +62,12 @@ function Navbar() {
           )}
 
           {token ? (
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-[var(--muted)] flex items-center gap-1">
+            <Link to="/settings" className="flex items-center gap-3 text-[var(--muted)] hover:text-[var(--text)] transition-colors" title="Settings">
+              <span className="text-sm flex items-center gap-1">
                 <User size={14} /> {name}
               </span>
-              <button onClick={handleLogout} className="text-[var(--muted)] hover:text-red-600">
-                <LogOut size={18} />
-              </button>
-            </div>
+              <SettingsIcon size={18} />
+            </Link>
           ) : (
             <Link
               to="/login"
