@@ -20,6 +20,24 @@
   --accent-dark: #EA580C;
 }
 
+/* Navbar always stays a deep, fixed tone independent of theme so it never
+   blends into the page background in either light or dark mode. */
+:root {
+  --navbar-bg: #1C1917;
+  --navbar-bg-elevated: #262220;
+  --navbar-text: #F5F3EE;
+  --navbar-muted: #A8A29E;
+  --navbar-border: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] {
+  --navbar-bg: #0B0A07;
+  --navbar-bg-elevated: #17140F;
+  --navbar-text: #F5F3EE;
+  --navbar-muted: #9C9689;
+  --navbar-border: rgba(255, 255, 255, 0.06);
+}
+
 * {
   box-sizing: border-box;
 }

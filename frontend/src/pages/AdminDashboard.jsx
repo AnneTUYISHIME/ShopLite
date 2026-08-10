@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Users, Package, ClipboardList, Trash2, ShieldOff, ShieldCheck, Store, Loader2, Inbox } from 'lucide-react';
+import { Users, Package, ClipboardList, Trash2, ShieldOff, ShieldCheck, ShieldPlus, Store, Loader2, Inbox } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import api from '../api/axios';
 
@@ -88,6 +88,16 @@ function AdminDashboard() {
       setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, enabled: !u.enabled } : u)));
     } catch (err) {
       setMessage('Failed to update user status');
+    }
+  };
+
+  const makeAdmin = async (user) => {
+    if (!window.confirm(`Grant admin access to ${user.name} (${user.email})? This gives them full platform control.`)) return;
+    try {
+      await api.put(`/admin/users/${user.id}/role`, { role: 'ADMIN' });
+      setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, role: 'ADMIN' } : u)));
+    } catch (err) {
+      setMessage('Failed to grant admin access');
     }
   };
 
@@ -212,13 +222,22 @@ function AdminDashboard() {
                       {u.enabled ? 'Active' : 'Disabled'}
                     </span>
                     {u.role !== 'ADMIN' && (
-                      <button
-                        onClick={() => toggleUserStatus(u)}
-                        title={u.enabled ? 'Disable account' : 'Enable account'}
-                        className={u.enabled ? 'text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors' : 'text-green-600 hover:bg-green-50 p-2 rounded-lg transition-colors'}
-                      >
-                        {u.enabled ? <ShieldOff size={16} /> : <ShieldCheck size={16} />}
-                      </button>
+                      <>
+                        <button
+                          onClick={() => makeAdmin(u)}
+                          title="Grant admin access"
+                          className="text-purple-600 hover:bg-purple-50 p-2 rounded-lg transition-colors"
+                        >
+                          <ShieldPlus size={16} />
+                        </button>
+                        <button
+                          onClick={() => toggleUserStatus(u)}
+                          title={u.enabled ? 'Disable account' : 'Enable account'}
+                          className={u.enabled ? 'text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors' : 'text-green-600 hover:bg-green-50 p-2 rounded-lg transition-colors'}
+                        >
+                          {u.enabled ? <ShieldOff size={16} /> : <ShieldCheck size={16} />}
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
